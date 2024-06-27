@@ -74,3 +74,60 @@ data:
 
 
     }
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx
+  namespace: frontend
+  uid: 6484765f-b6fc-409b-bc7b-9ccc46bb147f
+  resourceVersion: '3556867683'
+  creationTimestamp: '2024-06-27T14:32:13Z'
+  labels:
+    app: nginx
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: v1
+      time: '2024-06-27T14:39:06Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:labels':
+            .: {}
+            'f:app': {}
+        'f:spec':
+          'f:internalTrafficPolicy': {}
+          'f:ipFamilies': {}
+          'f:ipFamilyPolicy': {}
+          'f:ports':
+            .: {}
+            'k:{"port":8080,"protocol":"TCP"}':
+              .: {}
+              'f:name': {}
+              'f:port': {}
+              'f:protocol': {}
+              'f:targetPort': {}
+          'f:selector': {}
+          'f:sessionAffinity': {}
+          'f:type': {}
+spec:
+  clusterIP: 172.30.111.87
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - 172.30.111.87
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: nginx
+status:
+  loadBalancer: {}
+

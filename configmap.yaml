@@ -1,3 +1,31 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configmap
+data:
+  default.conf: |
+    server {
+      listen 8080;
+      server_name example.com;
+      location / {
+        proxy_pass  http://security-service:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;        
+        post_action @post_action; 
+      }
+
+      location @post_action {
+        internal;
+        proxy_pass  http://main-service:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;        
+      }
+
+
+    }
+---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -42,77 +70,15 @@ spec:
       maxSurge: 25%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
-
-
-
-
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: nginx-configmap
-  namespace: frontend
-data:
-  default.conf: |
-    server {
-      listen 8080;
-      server_name example.com;
-      location / {
-        proxy_pass  http://security-service:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;        
-        post_action @post_action; 
-      }
-
-      location @post_action {
-        internal;
-        proxy_pass  http://main-service:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;        
-      }
-
-
-    }
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: nginx
   namespace: frontend
-  uid: 6484765f-b6fc-409b-bc7b-9ccc46bb147f
-  resourceVersion: '3556867683'
-  creationTimestamp: '2024-06-27T14:32:13Z'
   labels:
     app: nginx
-  managedFields:
-    - manager: Mozilla
-      operation: Update
-      apiVersion: v1
-      time: '2024-06-27T14:39:06Z'
-      fieldsType: FieldsV1
-      fieldsV1:
-        'f:metadata':
-          'f:labels':
-            .: {}
-            'f:app': {}
-        'f:spec':
-          'f:internalTrafficPolicy': {}
-          'f:ipFamilies': {}
-          'f:ipFamilyPolicy': {}
-          'f:ports':
-            .: {}
-            'k:{"port":8080,"protocol":"TCP"}':
-              .: {}
-              'f:name': {}
-              'f:port': {}
-              'f:protocol': {}
-              'f:targetPort': {}
-          'f:selector': {}
-          'f:sessionAffinity': {}
-          'f:type': {}
 spec:
-  clusterIP: 172.30.111.87
   ipFamilies:
     - IPv4
   ports:
@@ -121,8 +87,6 @@ spec:
       port: 8080
       targetPort: 8080
   internalTrafficPolicy: Cluster
-  clusterIPs:
-    - 172.30.111.87
   type: ClusterIP
   ipFamilyPolicy: SingleStack
   sessionAffinity: None
@@ -130,4 +94,3 @@ spec:
     app: nginx
 status:
   loadBalancer: {}
-
